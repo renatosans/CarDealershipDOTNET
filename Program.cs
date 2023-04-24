@@ -25,5 +25,16 @@ app.MapGet("/cars", async (CarDealershipDB db) => await db.Cars.ToListAsync())
 .Produces<List<CarsForSale>>(StatusCodes.Status200OK)
 .WithName("GetAllCars").WithTags("Getters");
 
+// Add a new Car to database
+app.MapPost("/cars", async ([FromBody] CarsForSale newCar, [FromServices] CarDealershipDB db, HttpResponse response) => {
+    db.Cars.Add(newCar);
+    await db.SaveChangesAsync();
+    response.StatusCode = 200;
+    response.Headers.Location = $"cars/{newCar.id}";
+})
+.Accepts<CarsForSale>("application/json")
+.Produces<CarsForSale>(StatusCodes.Status201Created)
+.WithName("AddNewCar").WithTags("Setters");
+
 
 app.Run();
