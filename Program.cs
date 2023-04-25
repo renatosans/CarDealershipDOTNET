@@ -6,11 +6,17 @@ builder.Services.AddDbContext<CarDealershipDB>(options => {
     options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
+// Enable CORS
+builder.Services.AddCors();
+
 // Inject Swagger Services 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c => { });
 
 var app = builder.Build();
+app.UsePathBase(new PathString("/api"));
+app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
 
 //Use Swagger in application. 
 app.UseSwagger();
@@ -76,4 +82,5 @@ app.MapGet("/cars_filtered", async (int fromYear, int toYear, int fromMileage, i
 .WithName("GetCarsFiltered").WithTags("Getters");
 
 
+app.UseRouting();
 app.Run();
