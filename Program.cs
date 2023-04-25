@@ -46,4 +46,16 @@ app.MapGet("/cars_by_price", async (decimal min, decimal max, CarDealershipDB db
 .WithName("GetCarsByPrice").WithTags("Getters");
 
 
+// Get Cars from database filtered
+app.MapGet("/cars_filtered", async (int fromYear, int toYear, int fromMileage, int toMileage, decimal fromPrice, decimal toPrice, CarDealershipDB db) =>
+    await db.Cars
+        .Where(vehicle => vehicle.year >= fromYear && vehicle.year <= toYear)
+        .Where(vehicle => vehicle.mileage >= fromMileage && vehicle.mileage <= toMileage)
+        .Where(vehicle => vehicle.price >= fromPrice && vehicle.price <= toPrice)
+        .ToListAsync()
+)
+.Produces<List<CarsForSale>>(StatusCodes.Status200OK)
+.WithName("GetCarsFiltered").WithTags("Getters");
+
+
 app.Run();
