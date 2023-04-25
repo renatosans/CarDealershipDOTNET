@@ -44,6 +44,18 @@ app.MapPost("/cars", async ([FromBody] CarsForSale newCar, [FromServices] CarDea
 .WithName("AddNewCar").WithTags("Setters");
 
 
+// Add a new Customer to database
+app.MapPost("/customers", async ([FromBody] Customer newCustomer, [FromServices] CarDealershipDB db, HttpResponse response) => {
+    db.Customers.Add(newCustomer);
+    await db.SaveChangesAsync();
+    response.StatusCode = 200;
+    response.Headers.Location = $"customers/{newCustomer.id}";
+})
+.Accepts<Customer>("application/json")
+.Produces<Customer>(StatusCodes.Status201Created)
+.WithName("AddNewCustomer").WithTags("Setters");
+
+
 // Get Cars from database filtered by price
 app.MapGet("/cars_by_price", async (decimal min, decimal max, CarDealershipDB db) =>
     await db.Cars.Where(vehicle => vehicle.price >= min && vehicle.price <= max).ToListAsync()
