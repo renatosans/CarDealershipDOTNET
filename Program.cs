@@ -18,12 +18,18 @@ app.UseSwaggerUI();
 
 
 // Sample Endpoint
-app.MapGet("/", () => "Hello! This is .NET 6 Minimal API.   /swagger to get Endpoints doc.");
+app.MapGet("/", () => "Hello! This is .NET 6 Minimal API.   /swagger to get Endpoints doc.").ExcludeFromDescription();
 
 // Get all cars from database
 app.MapGet("/cars", async (CarDealershipDB db) => await db.Cars.ToListAsync())
 .Produces<List<CarsForSale>>(StatusCodes.Status200OK)
 .WithName("GetAllCars").WithTags("Getters");
+
+
+// Get all customers from database
+app.MapGet("/customers", async (CarDealershipDB db) => await db.Customers.ToListAsync())
+.Produces<List<Customer>>(StatusCodes.Status200OK)
+.WithName("GetAllCustomers").WithTags("Getters");
 
 
 // Add a new Car to database
