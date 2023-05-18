@@ -1,3 +1,4 @@
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Inject Connection String and Create EFCore DB Context 
@@ -37,9 +38,20 @@ app.MapGet("/customers", async (CarDealershipDB db) => await db.Customers.ToList
 .Produces<List<Customer>>(StatusCodes.Status200OK)
 .WithName("GetAllCustomers").WithTags("Getters");
 
-
 // Add a new Car to database
-app.MapPost("/cars", async ([FromBody] CarsForSale newCar, [FromServices] CarDealershipDB db, HttpResponse response) => {
+app.MapPost("/cars", async ([FromBody] VehiclePayload payload, [FromServices] CarDealershipDB db, HttpResponse response) => {
+    String outputDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\img";
+    Directory.CreateDirectory(outputDir);
+
+    String filename = "generate_new_file_name";
+    String extension = payload.image_format.Replace(@"image/", "").Replace(@";base64", "");
+
+    Byte[] fileContents = Convert.FromBase64String(payload.image_data);
+    FileStream fileStream = new FileStream(outputDir + @"\" + filename + "." + extension, FileMode.CreateNew);
+    fileStream.Write(fileContents, 0, fileContents.Length);
+    fileStream.Flush();
+
+    CarsForSale newCar = payload as CarsForSale;
     db.Cars.Add(newCar);
     await db.SaveChangesAsync();
     response.StatusCode = 200;
