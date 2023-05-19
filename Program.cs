@@ -40,6 +40,8 @@ app.MapGet("/customers", async (CarDealershipDB db) => await db.Customers.ToList
 
 // Add a new Car to database
 // TODO: fix relative path pointing to image file
+// frontend and backend must use the same file system path,  witch is causing the problem
+// the outputdir is currently pointing to the backend folder
 app.MapPost("/cars", async ([FromBody] VehiclePayload payload, [FromServices] CarDealershipDB db, HttpResponse response) => {
     String outputDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"/img/cars/";
     Directory.CreateDirectory(outputDir);
