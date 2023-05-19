@@ -43,15 +43,17 @@ app.MapPost("/cars", async ([FromBody] VehiclePayload payload, [FromServices] Ca
     String outputDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\img";
     Directory.CreateDirectory(outputDir);
 
-    String filename = "generate_new_file_name";
+    String filename = "generate_new_file_name" + payload.image_data.Length;
     String extension = payload.image_format.Replace(@"image/", "").Replace(@";base64", "");
+    String filePath = outputDir + @"\" + filename + "." + extension;
 
     Byte[] fileContents = Convert.FromBase64String(payload.image_data);
-    FileStream fileStream = new FileStream(outputDir + @"\" + filename + "." + extension, FileMode.CreateNew);
+    FileStream fileStream = new FileStream(filePath, FileMode.CreateNew);
     fileStream.Write(fileContents, 0, fileContents.Length);
     fileStream.Flush();
 
     CarsForSale newCar = payload as CarsForSale;
+    newCar.img = filePath;
     db.Cars.Add(newCar);
     await db.SaveChangesAsync();
     response.StatusCode = 200;
