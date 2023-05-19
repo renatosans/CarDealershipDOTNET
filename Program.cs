@@ -39,16 +39,17 @@ app.MapGet("/customers", async (CarDealershipDB db) => await db.Customers.ToList
 .WithName("GetAllCustomers").WithTags("Getters");
 
 // Add a new Car to database
+// TODO: fix relative path pointing to image file
 app.MapPost("/cars", async ([FromBody] VehiclePayload payload, [FromServices] CarDealershipDB db, HttpResponse response) => {
-    String outputDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\img";
+    String outputDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
     Directory.CreateDirectory(outputDir);
 
     String filename = "generate_new_file_name" + payload.image_data.Length;
     String extension = payload.image_format.Replace(@"image/", "").Replace(@";base64", "");
-    String filePath = outputDir + @"\" + filename + "." + extension;
+    String filePath = @"\img\" + filename + "." + extension;
 
     Byte[] fileContents = Convert.FromBase64String(payload.image_data);
-    FileStream fileStream = new FileStream(filePath, FileMode.CreateNew);
+    FileStream fileStream = new FileStream(outputDir + filePath, FileMode.CreateNew);
     fileStream.Write(fileContents, 0, fileContents.Length);
     fileStream.Flush();
 
